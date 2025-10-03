@@ -1,0 +1,47 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    vector<string> result;
+
+    // Mapping digits to letters (like old mobile phones)
+    string keypad[10] = {"", "", "abc", "def", "ghi", "jkl",
+                          "mno", "pqrs", "tuv", "wxyz"};
+
+    void solve(vector<int> &arr, int index, string current) {
+        // Base case: if we have processed all digits
+        if (index == arr.size()) {
+            result.push_back(current);
+            return;
+        }
+
+        int digit = arr[index];
+
+        // Skip 0 or 1
+        if (digit < 2 || digit > 9) {
+            solve(arr, index + 1, current); // skip or continue
+            return;
+        }
+
+        // Iterate over letters mapped to current digit
+        for (char ch : keypad[digit]) {
+            // Add letter to current word and recurse
+            solve(arr, index + 1, current + ch);
+
+            // Inline dry run example:
+            // arr = [2,3]
+            // index=0, digit=2 -> letters='a','b','c'
+            // current="" 
+            // 1st recursion: current="a", index=1
+            // index=1, digit=3 -> letters='d','e','f'
+            // Recursion builds: "ad","ae","af"
+        }
+    }
+
+    vector<string> possibleWords(vector<int> &arr) {
+        result.clear();
+        solve(arr, 0, "");
+        return result;
+    }
+};
