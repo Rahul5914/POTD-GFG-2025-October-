@@ -1,0 +1,230 @@
+this is a classic Backtracking + Recursion problem.
+Let’s go step-by-step just like your previous structured notes (so it fits your GitHub “Backtracking Collection”).
+
+🧩 Problem: Knight’s Tour Problem
+
+Given an n × n chessboard, place the knight on cell (0, 0) and move it so that it visits every cell exactly once.
+Return the path matrix showing the order of visiting.
+
+🎯 Intuition
+
+A Knight moves in an L-shape: 8 possible directions
+(±2, ±1) and (±1, ±2)
+
+We need to explore all valid moves and find a path that visits every cell exactly once.
+
+This is a classic Hamiltonian path problem solved using Backtracking.
+
+⚙️ Approach (Backtracking)
+
+Idea:
+Start from (0,0) with step 0, try all 8 possible moves of a knight.
+If the move is valid and not visited, mark it and explore recursively.
+If you manage to visit all n*n cells, you’ve found a solution.
+
+If no move leads to a solution, backtrack (unmark and try another).
+
+🧮 Recurrence Relation
+
+Let dfs(r, c, move) = true if knight can complete tour starting from (r, c) at move number move.
+
+𝑑
+𝑓
+𝑠
+(
+𝑟
+,
+𝑐
+,
+𝑚
+𝑜
+𝑣
+𝑒
+)
+=
+{
+𝑡
+𝑟
+𝑢
+𝑒
+,
+	
+if 
+𝑚
+𝑜
+𝑣
+𝑒
+=
+=
+𝑛
+∗
+𝑛
+−
+1
+
+
+∃
+(
+𝑑
+𝑟
+,
+𝑑
+𝑐
+)
+ such that move next is valid and 
+𝑑
+𝑓
+𝑠
+(
+𝑟
++
+𝑑
+𝑟
+,
+𝑐
++
+𝑑
+𝑐
+,
+𝑚
+𝑜
+𝑣
+𝑒
++
+1
+)
+dfs(r,c,move)={
+true,
+∃(dr,dc) such that move next is valid and dfs(r+dr,c+dc,move+1)
+	​
+
+if move==n∗n−1
+🧠 Base Condition
+
+If move == n*n, all cells visited → return true.
+
+🧭 Steps
+
+Create n x n board initialized with -1
+
+Place knight at (0,0) with move count 0
+
+Try all 8 possible moves recursively
+
+Backtrack if no path leads to a solution
+
+Return the final board
+
+✅ C++ Code (Fully Annotated with Dry Run)
+#include <bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    // Knight moves: (8 directions)
+    int dx[8] = {2, 1, -1, -2, -2, -1, 1, 2};
+    int dy[8] = {1, 2, 2, 1, -1, -2, -2, -1};
+
+    bool isValid(int x, int y, int n, vector<vector<int>>& board) {
+        // Check if position is inside board and not visited yet
+        return (x >= 0 && y >= 0 && x < n && y < n && board[x][y] == -1);
+    }
+
+    bool solve(int x, int y, int move, int n, vector<vector<int>>& board) {
+        // Base condition: all cells visited
+        if (move == n * n)
+            return true;
+
+        // Try all 8 possible moves
+        for (int i = 0; i < 8; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if (isValid(nx, ny, n, board)) {
+                board[nx][ny] = move; // choose
+                if (solve(nx, ny, move + 1, n, board))
+                    return true; // explore
+                board[nx][ny] = -1; // un-choose (backtrack)
+            }
+        }
+        return false;
+    }
+
+    vector<vector<int>> knightTour(int n) {
+        vector<vector<int>> board(n, vector<int>(n, -1));
+        board[0][0] = 0; // starting point
+
+        if (solve(0, 0, 1, n, board))
+            return board;
+
+        // If no solution exists (for smaller boards like n=2, n=3)
+        return {};
+    }
+};
+
+int main() {
+    int n = 5;
+    Solution obj;
+    auto res = obj.knightTour(n);
+
+    if (res.empty()) {
+        cout << "No Solution Exists\n";
+    } else {
+        for (auto& row : res) {
+            for (auto& val : row)
+                cout << setw(2) << val << " ";
+            cout << endl;
+        }
+    }
+}
+
+🧩 Example Dry Run (n = 5)
+Start (0,0)
+→ move 1 → (2,1)
+→ move 2 → (4,2)
+→ ...
+continues until move = 24
+→ all 25 cells filled ⇒ return true
+
+
+Output matrix (one possible tour):
+
+ 0 19  8 13  2
+ 9 14  1 18 23
+20  7 24  3 12
+15 10  5 22 17
+ 6 21 16 11  4
+
+⏱ Time Complexity
+
+In worst case: O(8^(n*n)) (since each cell has up to 8 moves)
+
+But with pruning, it reduces drastically for moderate n (like 5 or 6)
+
+💾 Space Complexity
+
+O(n^2) for recursion stack and board
+
+💡 Pattern Recognition
+
+This fits Backtracking Framework:
+
+choose → explore → un-choose
+
+
+and is conceptually similar to:
+
+Rat in a Maze
+
+N-Queens
+
+Sudoku Solver
+
+Hamiltonian Path
+
+🧠 Trick to Remember
+
+Whenever the problem says:
+
+“visit all cells exactly once” or “find all possible tours/paths”
+→ Think Hamiltonian path → Backtracking
