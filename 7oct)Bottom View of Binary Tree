@@ -1,0 +1,107 @@
+this is a Binary Tree Bottom View problem (GFG).
+Let’s go step-by-step so you can understand, remember, and apply this pattern easily in future.
+
+🌳 Problem Restatement
+
+We need to find the bottom view of a binary tree — i.e., the nodes visible when viewed from the bottom.
+
+🧠 Key Intuition:
+
+Each node has a horizontal distance (HD) from the root:
+
+Root → HD = 0
+
+Left child → HD = parent HD - 1
+
+Right child → HD = parent HD + 1
+
+When you traverse the tree level-by-level (BFS), the latest node encountered for each HD will be the bottommost one.
+
+✅ Approach: Level Order Traversal (BFS) + Horizontal Distance Mapping
+
+We’ll use:
+
+A queue for level order traversal storing {node, HD} pairs.
+
+A map<int, int> to store HD → node->data (automatically sorted by HD).
+
+At the end, the map’s values (from leftmost HD to rightmost) give the bottom view.
+
+⚙️ Step-by-Step Logic
+
+Create a queue of pairs {Node*, int} where int is horizontal distance.
+
+Start with {root, 0}.
+
+Perform level order traversal:
+
+Pop node and its HD.
+
+Store/update the map: mp[hd] = node->data
+(latest node at same HD replaces previous — ensures bottommost)
+
+Push left child with hd - 1.
+
+Push right child with hd + 1.
+
+After traversal, collect map values in order of increasing HD.
+
+💻 Full Code (C++ with Explanation)
+class Solution {
+  public:
+    vector<int> bottomView(Node *root) {
+        vector<int> ans;
+        if (!root) return ans;
+
+        // Map to store hd → node value
+        map<int, int> mp;
+        
+        // Queue for BFS: stores {node, horizontal_distance}
+        queue<pair<Node*, int>> q;
+        q.push({root, 0});
+
+        while (!q.empty()) {
+            auto it = q.front();
+            q.pop();
+
+            Node* node = it.first;
+            int hd = it.second;
+
+            // Update map (latest node at this HD replaces previous)
+            mp[hd] = node->data;
+
+            // Push children with updated HD
+            if (node->left)
+                q.push({node->left, hd - 1});
+            if (node->right)
+                q.push({node->right, hd + 1});
+        }
+
+        // Extract bottom view from leftmost to rightmost HD
+        for (auto &p : mp)
+            ans.push_back(p.second);
+
+        return ans;
+    }
+};
+
+⏱️ Complexity Analysis
+Type	Complexity
+Time	O(N) — each node visited once
+Space	O(N) — for queue + map
+🧩 Pattern Recognition
+
+This belongs to the Horizontal Distance + Level Order family:
+
+Top View → first node at each HD
+
+Bottom View → last node at each HD
+
+Vertical Order Traversal → all nodes grouped by HD
+
+👉 Common Trick: use a map of hd → vector<int> or hd → value and BFS traversal.
+
+🎯 Quick Recap
+Problem	Keep in map?	Update Condition	View
+Top View	if not present	only first	Seen from top
+Bottom View	always update	last one wins	Seen from bottom
