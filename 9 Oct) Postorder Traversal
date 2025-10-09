@@ -1,0 +1,159 @@
+Postorder Traversal of a Binary Tree (GFG/Leetcode style) in four complete approaches — recursive, using one stack, using two stacks, and Morris traversal — with step-by-step explanation and fully commented C++ code ✅
+
+🌳 Problem: Postorder Traversal
+
+Definition:
+In Postorder Traversal, we visit nodes in the following order:
+👉 Left → Right → Root
+
+🧩 1️⃣ Recursive Solution
+🔹 Idea:
+
+Traverse left subtree
+
+Traverse right subtree
+
+Process (store) current node value
+
+🧠 Recurrence Relation:
+postorder(root) = postorder(root->left)
+                + postorder(root->right)
+                + root->data
+
+🧮 Time Complexity:
+
+O(N) — every node visited once
+
+💾 Space Complexity:
+
+O(H) — recursion stack height (H = height of tree)
+
+💻 Code:
+class Solution {
+  public:
+    void solve(Node* root, vector<int>& ans) {
+        if (root == NULL) return;
+        
+        // Left subtree
+        solve(root->left, ans);
+        // Right subtree
+        solve(root->right, ans);
+        // Process current node
+        ans.push_back(root->data);
+    }
+    
+    vector<int> postOrder(Node* root) {
+        vector<int> ans;
+        solve(root, ans);
+        return ans;
+    }
+};
+
+🧩 2️⃣ Iterative (Using Two Stacks)
+🔹 Idea:
+
+Use stack1 for traversal.
+
+Use stack2 to store nodes in Root → Right → Left order.
+
+Reverse stack2 at the end to get Left → Right → Root (Postorder).
+
+🧮 Time: O(N) | Space: O(N)
+💻 Code:
+class Solution {
+  public:
+    vector<int> postOrder(Node* root) {
+        vector<int> ans;
+        if (root == NULL) return ans;
+        
+        stack<Node*> st1, st2;
+        st1.push(root);
+        
+        while (!st1.empty()) {
+            Node* node = st1.top();
+            st1.pop();
+            st2.push(node);
+            
+            if (node->left) st1.push(node->left);
+            if (node->right) st1.push(node->right);
+        }
+        
+        // Reverse the order using second stack
+        while (!st2.empty()) {
+            ans.push_back(st2.top()->data);
+            st2.pop();
+        }
+        return ans;
+    }
+};
+
+🧩 3️⃣ Iterative (Using One Stack)
+🔹 Idea:
+
+Simulate recursion manually.
+
+Use pointer to track previously visited nodes.
+
+🔁 Steps:
+
+Go as left as possible.
+
+Peek top node.
+
+If right child exists and not visited → move to right.
+
+Else → process (pop and add to answer).
+
+🧮 Time: O(N) | Space: O(N)
+💻 Code:
+class Solution {
+  public:
+    vector<int> postOrder(Node* root) {
+        vector<int> ans;
+        if (root == NULL) return ans;
+        
+        stack<Node*> st;
+        Node* curr = root;
+        Node* lastVisited = NULL;
+        
+        while (!st.empty() || curr != NULL) {
+            if (curr != NULL) {
+                st.push(curr);
+                curr = curr->left;
+            } else {
+                Node* peekNode = st.top();
+                
+                // If right child exists and not visited, move right
+                if (peekNode->right != NULL && lastVisited != peekNode->right) {
+                    curr = peekNode->right;
+                } else {
+                    ans.push_back(peekNode->data);
+                    lastVisited = peekNode;
+                    st.pop();
+                }
+            }
+        }
+        return ans;
+    }
+};
+
+🧩 4️⃣ Morris Postorder Traversal (O(1) Space)
+🔹 Idea:
+
+Use threaded binary tree concept.
+Create temporary links to predecessors and reverse result.
+
+🧮 Time: O(N) | Space: O(1)
+
+(Space-efficient but complex — rarely used in interviews.)
+
+🧠 Pattern Recognition for Interview:
+Traversal	Order	Common Trick
+Preorder	Root → Left → Right	Use stack and push Right first, then Left
+Inorder	Left → Root → Right	Use controlled traversal with stack
+Postorder	Left → Right → Root	Use two stacks or one stack with tracking
+🪶 Interview Tip:
+
+🔥 If asked to implement postorder iteratively, the two-stack method is the easiest to write under pressure.
+
+✅ Use one stack if interviewer asks for “optimized version”.
